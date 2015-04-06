@@ -1,0 +1,10 @@
+html, body {
+  height: 100%;
+}
+
+#map {
+  height: 70%;
+  width: 100%;
+  border: red;
+}
+

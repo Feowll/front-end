@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Feowl - Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+  <script src="powercuts.js"></script>
+ </head>
+ <body onload="setup()">
+  <!-- MENU SECTION -->
+  <div id="menu">
+   <p><a href="main.html">Feowl</a> | <a href="main.html#map">map</a> | news | articles | <a href="presentation.html">presentation</a> | login:_____</p>
+  </div>
+  <a name="about"></a>
+  <div id="about">
+    <p class="standout">Electricity is essential.</p>
+    <p>Without electricity, development is hard to achieve.</p>
+    <p>Today, 622 million of the 1 billion inhabitants of Africa do not have
+    access to electricity.</p>
+    <p>Even when there is electricity, it is subject to frequent outages. Nobody
+    knows exactly how much, but everybody knows how incapacitating it is not to
+    have electricity: No Internet, no TV, and insecurity. How many freezers had
+    to be replaced in households because of electricity coming in and out? How
+    much does each household spend in the purchase of generators?</p>
+    <p class="standout">More data, less “palabres”</p>
+    <h2>That's where Feowl comes in:</h2>
+    <p><span class="standout">What is Feowl?</span> Feowl is a web and mobile
+    friendly platform that produces open and accurate data on the lack of
+    electricity in major African cities.</p>
+    <p><span class="standout">How does it work?</span> Citizens can register
+    and report any power outage they witness. Feowl team then computes the
+    information received from the citizen, and displays them in user-friendly
+    graphs.</p>
+    <p><span class="standout">How does it help?</span> At Feowl, we believe
+    that what can be measured can be changed.</p>
+  </div>
+  <!-- MAP SECTION -->
+  <a name="map"></a>
+  <div id="map"></div>
+  <div id="time-selector">
+   <p>Time: |---------[       ]------------------------------------|</p>
+  <div>
+  <!-- WALL SECTION -->
+  <div id="wall">
+   <ul>
+    <li>2 hours ago - &ldquo;latest comment&rdquo; - <i>user1</i></li>
+    <li>5 hours ago - &ldquo;penultimate comment&rdquo; - <i>user2</i></li>
+    <li>6 hours ago - &ldquo;second-to-last comment&rdquo; - <i>user3</i></li>
+   </ul>
+  </div>
+ </body>
+</html>
+<script>
+function strOfTimeStamp(ts) {
+  var date = new Date(ts * 1000);
+  return date.toLocaleString();
+}
+
+function popupOfPowerCut(pc) {
+  str = strOfTimeStamp(pc[2]) + ' &rarr; ' + strOfTimeStamp(pc[3]);
+  if (pc[4].length > 0) {
+    str += '<br/>Comment: '+pc[4];
+  }
+  return str;
+}
+
+function setup() {
+  var map = L.map('map');
+  var osm = new L.TileLayer(
+    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    }
+  );
+  map.setView([4.044, 9.732], 14);
+  map.addLayer(osm);
+  var markers = L.markerClusterGroup();
+  powercuts = getPowerCuts();
+  for (var i = 0; i < powercuts.length; i++) {
+    var pc = powercuts[i];
+    var title = pc[4];
+    var marker = L.marker(new L.LatLng(pc[0], pc[1]), { title: pc[4] });
+    marker.bindPopup(popupOfPowerCut(pc));
+    markers.addLayer(marker);
+  }
+  map.addLayer(markers);
+}
+</script>
