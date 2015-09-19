@@ -1,17 +1,24 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-  <title>Parallax Template - Materialize</title>
+  <title>Feowl</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <!-- materialize -->
+  <link rel="stylesheet" href="css/materialize.min.css" type="text/css" media="screen,projection"/>
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen,projection"/>
+  <!-- leaflet -->
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="style.css" />
 
-  <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+  <script src="powercuts.js"></script>
 </head>
-<body>
+<body onload="setup()">
   <nav class="white" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="#" class="brand-logo green-text">Feweo</a>
@@ -107,7 +114,8 @@
         <div class="col s12 center">
           <h1 class="center green-text"><i class="Large material-icons">location_on</i></h1>
           <h4>The PowerCut Map</h4>
-          <p class="left-align light">MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ MAP ++++ </p>
+            <a name="map"></a>
+            <div id="map"></div>
         </div>
       </div>
 
@@ -249,3 +257,39 @@
 
   </body>
 </html>
+<script>
+function strOfTimeStamp(ts) {
+  var date = new Date(ts * 1000);
+  return date.toLocaleString();
+}
+
+function popupOfPowerCut(pc) {
+  str = strOfTimeStamp(pc[2]) + ' &rarr; ' + strOfTimeStamp(pc[3]);
+  if (pc[4].length > 0) {
+    str += '<br/>Comment: '+pc[4];
+  }
+  return str;
+}
+
+function setup() {
+  var map = L.map('map');
+  var osm = new L.TileLayer(
+    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    }
+  );
+  map.setView([4.044, 9.732], 14);
+  map.addLayer(osm);
+  var markers = L.markerClusterGroup();
+  powercuts = getPowerCuts();
+  for (var i = 0; i < powercuts.length; i++) {
+    var pc = powercuts[i];
+    var title = pc[4];
+    var marker = L.marker(new L.LatLng(pc[0], pc[1]), { title: pc[4] });
+    marker.bindPopup(popupOfPowerCut(pc));
+    markers.addLayer(marker);
+  }
+  map.addLayer(markers);
+}
+</script>
